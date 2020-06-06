@@ -1,0 +1,1 @@
+To build your project you can run gradlew shadowJar in a terminal of your project root and it will produce a jar filled with your compiled code and JDA included in a single jar file! The jar can be found in build/libs
