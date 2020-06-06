@@ -24,6 +24,7 @@ repositories {
 
 dependencies {
   compile "net.dv8tion:JDA:4.1.1_101"
+  compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.20'
 }
 
 compileJava.options.encoding = 'UTF-8'
