@@ -51,9 +51,9 @@ public class Main extends ListenerAdapter{
 			}
 			else if (msg.startsWith("/createevent"))
 			{
-				CreateEvent events = new CreateEvent(db);
-//				String test = events.selectTest();
-//				event.getChannel().sendMessage(test).queue();
+				CreateEvent newEvent = new CreateEvent(msg);
+				String formatted = newEvent.formatEvent(msg);
+				event.getChannel().sendMessage(formatted).queue();
 			}
 		}
 		
