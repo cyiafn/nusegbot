@@ -12,7 +12,7 @@ plugins {
   id 'com.github.johnrengelman.shadow' version '4.0.4'
 }
 
-mainClassName = 'com.example.jda.Bot'
+mainClassName = 'com.example.nuseg.Bot'
 
 version = '1.0'
 
