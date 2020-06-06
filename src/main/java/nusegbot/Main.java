@@ -30,23 +30,29 @@ public class Main extends ListenerAdapter{
 	@Override
 	public void onMessageReceived(MessageReceivedEvent event) {
 		//debug
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");  
-	    Date date = new Date();
-		System.out.println("["+ formatter.format(date) +"] Author: " + event.getAuthor().getName() + " | Message: " + event.getMessage().getContentDisplay());
-		
-		if (event.getMessage().getContentRaw().startsWith("/ping"))
+		if(event.getAuthor().isBot())
 		{
-			event.getChannel().sendMessage("Pong!").queue();
+			return;
 		}
-		else if (event.getMessage().getContentRaw().startsWith("/help"))
-		{
+		else {
+			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");  
+		    Date date = new Date();
+			System.out.println("["+ formatter.format(date) +"] Author: " + event.getAuthor().getName() + " | Message: " + event.getMessage().getContentDisplay());
 			
-		}
-		else if (event.getMessage().getContentRaw().startsWith("/createevent"))
-		{
-			CreateEvent events = new CreateEvent(db);
-//			String test = events.selectTest();
-//			event.getChannel().sendMessage(test).queue();
+			if (event.getMessage().getContentRaw().startsWith("/ping"))
+			{
+				event.getChannel().sendMessage("Pong!").queue();
+			}
+			else if (event.getMessage().getContentRaw().startsWith("/help"))
+			{
+				
+			}
+			else if (event.getMessage().getContentRaw().startsWith("/createevent"))
+			{
+				CreateEvent events = new CreateEvent(db);
+//				String test = events.selectTest();
+//				event.getChannel().sendMessage(test).queue();
+			}
 		}
 		
 	}
