@@ -39,15 +39,17 @@ public class Main extends ListenerAdapter{
 		    Date date = new Date();
 			System.out.println("["+ formatter.format(date) +"] Author: " + event.getAuthor().getName() + " | Message: " + event.getMessage().getContentDisplay());
 			
-			if (event.getMessage().getContentRaw().startsWith("/ping"))
+			String msg = event.getMessage().getContentRaw();
+			
+			if (msg.startsWith("/ping"))
 			{
 				event.getChannel().sendMessage("Pong!").queue();
 			}
-			else if (event.getMessage().getContentRaw().startsWith("/help"))
+			else if (msg.startsWith("/help"))
 			{
 				
 			}
-			else if (event.getMessage().getContentRaw().startsWith("/createevent"))
+			else if (msg.startsWith("/createevent"))
 			{
 				CreateEvent events = new CreateEvent(db);
 //				String test = events.selectTest();
