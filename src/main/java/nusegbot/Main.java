@@ -9,8 +9,10 @@ import java.util.Vector;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.internal.utils.PermissionUtil;
 import nusegbot.functions.CreateEvent;
 import nusegbot.functions.Giveaway;
 import net.dv8tion.jda.api.AccountType;
@@ -48,33 +50,69 @@ public class Main extends ListenerAdapter{
 			
 			String msg = event.getMessage().getContentRaw();
 			
-			if (msg.startsWith("/ping"))
-			{
-				event.getChannel().sendMessage("Pong!").queue();
-			}
-			else if (msg.startsWith("/help"))
-			{
-				
-			}
-			else if (msg.startsWith("/createevent"))
-			{
-				CreateEvent events = new CreateEvent(db);
-//				String test = events.selectTest();
-//				event.getChannel().sendMessage(test).queue();
-			}
-			else if (msg.startsWith("/giveaway "))
-			{
-				msg = msg.replace("/giveaway ", "");
-				if (msg.startsWith("create ")) {
-					msg = msg.replace("create ", "");
-					if (msg.contains(" ")) {
-						String[] msgParams;
-						msgParams = msg.split(" ");
+			if (msg.startsWith("/")) {
+				if (msg.startsWith("/ping"))
+				{
+					event.getChannel().sendMessage("Pong!").queue();
+				}
+				else if (msg.startsWith("/help"))
+				{
+					
+				}
+				else if (msg.startsWith("/createevent"))
+				{
+					CreateEvent events = new CreateEvent(db);
+//					String test = events.selectTest();
+//					event.getChannel().sendMessage(test).queue();
+				}
+				else if (msg.startsWith("/giveaway ") && PermissionUtil.checkPermission(event.getMember(), Permission.ADMINISTRATOR))
+				{
+					msg = msg.replace("/giveaway ", "");
+					if (msg.startsWith("create ")) {
+						msg = msg.replace("create ", "");
+						if (msg.contains(" ")) {
+							String[] msgParams;
+							msgParams = msg.split(" ");
+							boolean nameConflict = false;
+							ArrayList<String> giveawayNames = new ArrayList<String>();
+							try {
+								db.connect();
+								ResultSet rs = db.select("SELECT DISTINCT name FROM giveaways");
+								while (rs.next()) {
+									giveawayNames.add(rs.getString("name"));
+								}
+								db.close();
+							}
+							catch (Exception e) {
+								System.out.println(e);
+							}
+							for (int i = 0; i < giveawayNames.size(); i++)
+							{
+								if(giveawayNames.get(i).equals(msgParams[0])) {
+									nameConflict = true;
+								}
+							}
+							if (nameConflict == false) {
+								Giveaway tempGiveaway = new Giveaway(db, msgParams[0], msgParams[1]);
+								tempGiveaway.populateDatabase();
+								event.getChannel().sendMessage("populating database.").queue();
+							}
+							else {
+								event.getChannel().sendMessage("There is already an event with the same name active.").queue();
+							}
+							
+						}
+						else {
+							event.getChannel().sendMessage("You have entered an invalid command.").queue();
+						}
+					}
+					else if (msg.startsWith("roll ")) {
+						msg = msg.replace("roll ", "");
 						boolean nameConflict = false;
 						ArrayList<String> giveawayNames = new ArrayList<String>();
 						try {
 							db.connect();
-							ResultSet rs = db.select("SELECT DISTINCT name FROM giveaways");
+							ResultSet rs = db.select("SELECT DISTINCT name FROM giveaways WHERE active = TRUE");
 							while (rs.next()) {
 								giveawayNames.add(rs.getString("name"));
 							}
@@ -85,103 +123,69 @@ public class Main extends ListenerAdapter{
 						}
 						for (int i = 0; i < giveawayNames.size(); i++)
 						{
-							if(giveawayNames.get(i).equals(msgParams[0])) {
+							if(giveawayNames.get(i).equals(msg)) {
 								nameConflict = true;
 							}
 						}
-						if (nameConflict == false) {
-							Giveaway tempGiveaway = new Giveaway(db, msgParams[0], msgParams[1]);
-							tempGiveaway.populateDatabase();
-							event.getChannel().sendMessage("populating database.").queue();
+						if (nameConflict == true) {
+							ArrayList<String> ignList = new ArrayList<String>();
+							try {
+								db.connect();
+								ResultSet rs = db.select("SELECT ign FROM participants WHERE giveawayName = '"+msg+"' AND joinedVoice = TRUE");
+								while (rs.next()) {
+									ignList.add(rs.getString("ign"));
+								}
+								db.close();
+							}
+							catch (Exception e)
+							{
+								event.getChannel().sendMessage("There is currently no eligible participants.").queue();
+							}
+							if (ignList.size() > 1) {
+								Random rand = new Random();
+								int upperbound = ignList.size() + 1;
+								int int_random = rand.nextInt(upperbound);
+								String winner = ignList.get(int_random);
+								event.getChannel().sendMessage("The winner is " + winner+ "!").queue();
+								try {
+									db.connect();
+									db.update("DELETE FROM participants WHERE ign = '"+winner+"' AND giveawayName = '"+msg+"'");
+									db.close();
+								}
+								catch(Exception e){
+									
+								}
+							}
+							else if(ignList.size() == 1) {
+								String winner = ignList.get(0);
+								event.getChannel().sendMessage("The winner is " + winner+ "!").queue();
+								try {
+									db.connect();
+									db.update("DELETE FROM participants WHERE ign = '"+winner+"' AND giveawayName = '"+msg+"'");
+									db.close();
+								}
+								catch(Exception e){
+									
+								}
+							}
+							else {
+								event.getChannel().sendMessage("There are currently no eligible participants.").queue();
+							}
 						}
 						else {
-							event.getChannel().sendMessage("There is already an event with the same name active.").queue();
+							event.getChannel().sendMessage("There is no giveaway with that name or the giveaway is not active!").queue();
 						}
+					}
+					else if (msg.startsWith("close ")) {
 						
 					}
 					else {
 						event.getChannel().sendMessage("You have entered an invalid command.").queue();
 					}
 				}
-				else if (msg.startsWith("roll ")) {
-					msg = msg.replace("roll ", "");
-					boolean nameConflict = false;
-					ArrayList<String> giveawayNames = new ArrayList<String>();
-					try {
-						db.connect();
-						ResultSet rs = db.select("SELECT DISTINCT name FROM giveaways WHERE active = TRUE");
-						while (rs.next()) {
-							giveawayNames.add(rs.getString("name"));
-						}
-						db.close();
-					}
-					catch (Exception e) {
-						System.out.println(e);
-					}
-					for (int i = 0; i < giveawayNames.size(); i++)
-					{
-						if(giveawayNames.get(i).equals(msg)) {
-							nameConflict = true;
-						}
-					}
-					if (nameConflict == true) {
-						ArrayList<String> ignList = new ArrayList<String>();
-						try {
-							db.connect();
-							ResultSet rs = db.select("SELECT ign FROM participants WHERE giveawayName = '"+msg+"' AND joinedVoice = TRUE");
-							while (rs.next()) {
-								ignList.add(rs.getString("ign"));
-							}
-							db.close();
-						}
-						catch (Exception e)
-						{
-							event.getChannel().sendMessage("There is currently no eligible participants.").queue();
-						}
-						if (ignList.size() > 1) {
-							Random rand = new Random();
-							int upperbound = ignList.size() + 1;
-							int int_random = rand.nextInt(upperbound);
-							String winner = ignList.get(int_random);
-							event.getChannel().sendMessage("The winner is " + winner+ "!").queue();
-							try {
-								db.connect();
-								db.update("DELETE FROM participants WHERE ign = '"+winner+"' AND giveawayName = '"+msg+"'");
-								db.close();
-							}
-							catch(Exception e){
-								
-							}
-						}
-						else if(ignList.size() == 1) {
-							String winner = ignList.get(0);
-							event.getChannel().sendMessage("The winner is " + winner+ "!").queue();
-							try {
-								db.connect();
-								db.update("DELETE FROM participants WHERE ign = '"+winner+"' AND giveawayName = '"+msg+"'");
-								db.close();
-							}
-							catch(Exception e){
-								
-							}
-						}
-						else {
-							event.getChannel().sendMessage("There is currently no eligible participants.").queue();
-						}
-					}
-					else {
-						event.getChannel().sendMessage("There is no giveaway with that name or the giveaway is not active!").queue();
-					}
-				}
-				else if (msg.startsWith("close ")) {
-					
-				}
 				else {
-					event.getChannel().sendMessage("You have entered an invalid command.").queue();
+					event.getChannel().sendMessage("There is no such command.").queue();
 				}
-			}
-			else {
-				event.getChannel().sendMessage("There is no such command.").queue();
 			}
 		}
 		
