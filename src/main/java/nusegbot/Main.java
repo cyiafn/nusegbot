@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 import java.util.Vector;
 
 import net.dv8tion.jda.api.JDA;
@@ -103,7 +104,74 @@ public class Main extends ListenerAdapter{
 					}
 				}
 				else if (msg.startsWith("roll ")) {
-					
+					msg = msg.replace("roll ", "");
+					boolean nameConflict = false;
+					ArrayList<String> giveawayNames = new ArrayList<String>();
+					try {
+						db.connect();
+						ResultSet rs = db.select("SELECT DISTINCT name FROM giveaways WHERE active = TRUE");
+						while (rs.next()) {
+							giveawayNames.add(rs.getString("name"));
+						}
+						db.close();
+					}
+					catch (Exception e) {
+						System.out.println(e);
+					}
+					for (int i = 0; i < giveawayNames.size(); i++)
+					{
+						if(giveawayNames.get(i).equals(msg)) {
+							nameConflict = true;
+						}
+					}
+					if (nameConflict == true) {
+						ArrayList<String> ignList = new ArrayList<String>();
+						try {
+							db.connect();
+							ResultSet rs = db.select("SELECT ign FROM participants WHERE giveawayName = '"+msg+"' AND joinedVoice = TRUE");
+							while (rs.next()) {
+								ignList.add(rs.getString("ign"));
+							}
+							db.close();
+						}
+						catch (Exception e)
+						{
+							event.getChannel().sendMessage("There is currently no eligible participants.").queue();
+						}
+						if (ignList.size() > 1) {
+							Random rand = new Random();
+							int upperbound = ignList.size() + 1;
+							int int_random = rand.nextInt(upperbound);
+							String winner = ignList.get(int_random);
+							event.getChannel().sendMessage("The winner is " + winner+ "!").queue();
+							try {
+								db.connect();
+								db.update("DELETE FROM participants WHERE ign = '"+winner+"' AND giveawayName = '"+msg+"'");
+								db.close();
+							}
+							catch(Exception e){
+								
+							}
+						}
+						else if(ignList.size() == 1) {
+							String winner = ignList.get(0);
+							event.getChannel().sendMessage("The winner is " + winner+ "!").queue();
+							try {
+								db.connect();
+								db.update("DELETE FROM participants WHERE ign = '"+winner+"' AND giveawayName = '"+msg+"'");
+								db.close();
+							}
+							catch(Exception e){
+								
+							}
+						}
+						else {
+							event.getChannel().sendMessage("There is currently no eligible participants.").queue();
+						}
+					}
+					else {
+						event.getChannel().sendMessage("There is no giveaway with that name or the giveaway is not active!").queue();
+					}
 				}
 				else if (msg.startsWith("close ")) {
 					
