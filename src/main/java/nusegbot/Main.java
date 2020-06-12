@@ -10,6 +10,7 @@ import java.util.Vector;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.internal.utils.PermissionUtil;
@@ -98,7 +99,7 @@ public class Main extends ListenerAdapter{
 								event.getChannel().sendMessage("populating database.").queue();
 							}
 							else {
-								event.getChannel().sendMessage("There is already an event with the same name active.").queue();
+								event.getChannel().sendMessage("There is already an event with the same name.").queue();
 							}
 							
 						}
@@ -177,7 +178,40 @@ public class Main extends ListenerAdapter{
 						}
 					}
 					else if (msg.startsWith("close ")) {
-						
+						msg = msg.replace("close ", "");
+						boolean nameConflict = false;
+						ArrayList<String> giveawayNames = new ArrayList<String>();
+						try {
+							db.connect();
+							ResultSet rs = db.select("SELECT DISTINCT name FROM giveaways WHERE active = TRUE");
+							while (rs.next()) {
+								giveawayNames.add(rs.getString("name"));
+							}
+							db.close();
+						}
+						catch (Exception e) {
+							System.out.println(e);
+						}
+						for (int i = 0; i < giveawayNames.size(); i++)
+						{
+							if(giveawayNames.get(i).equals(msg)) {
+								nameConflict = true;
+							}
+						}
+						if (nameConflict == true) {
+							try {
+								db.connect();
+								db.update("UPDATE giveaways SET active = FALSE WHERE name = '"+msg+"'");
+								db.close();
+							}
+							catch(Exception e) {
+							
+							}
+							event.getChannel().sendMessage("Giveaway '" + msg + "' closed.").queue();
+						}
+						else {
+							event.getChannel().sendMessage("There is no such giveaway.").queue();
+						}
 					}
 					else {
 						event.getChannel().sendMessage("You have entered an invalid command.").queue();
@@ -189,5 +223,18 @@ public class Main extends ListenerAdapter{
 			}
 		}
 		
+	}
+	@Override
+	public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
+		String ign = event.getMember().getNickname();
+		try {
+			db.connect();
+			db.update("UPDATE participants SET joinedVoice = TRUE WHERE ign = '"+ign+"'");
+			db.close();
+		}
+		catch (Exception e)
+		{
+			
+		}
 	}
 }
