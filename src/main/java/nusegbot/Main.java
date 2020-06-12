@@ -224,6 +224,7 @@ public class Main extends ListenerAdapter{
 		}
 		
 	}
+	//onguildvoicejoin
 	@Override
 	public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
 		String ign = event.getMember().getNickname();
