@@ -51,6 +51,7 @@ public class Main extends ListenerAdapter{
 			
 			String msg = event.getMessage().getContentRaw();
 			
+
 			if (msg.startsWith("/")) {
 				if (msg.startsWith("/ping"))
 				{
@@ -62,9 +63,21 @@ public class Main extends ListenerAdapter{
 				}
 				else if (msg.startsWith("/createevent"))
 				{
-					CreateEvent events = new CreateEvent(db);
-//					String test = events.selectTest();
-//					event.getChannel().sendMessage(test).queue();
+					
+					CreateEvent newEvent = new CreateEvent(msg);
+					String eventStr = newEvent.formatEvent();
+					
+					String url = "";
+					
+				    if (!event.getMessage().getAttachments().isEmpty() && event.getMessage().getAttachments().get(0).isImage()) 
+				    {
+				        url = event.getMessage().getAttachments().get(0).getUrl();
+				        eventStr += url;
+				    }
+					
+					event.getChannel().sendMessage(eventStr).queue();
+					event.getMessage().delete().queue();
+					
 				}
 				else if (msg.startsWith("/giveaway ") && PermissionUtil.checkPermission(event.getMember(), Permission.ADMINISTRATOR))
 				{
@@ -221,6 +234,7 @@ public class Main extends ListenerAdapter{
 				else {
 					event.getChannel().sendMessage("There is no such command.").queue();
 				}
+
 			}
 		}
 		
