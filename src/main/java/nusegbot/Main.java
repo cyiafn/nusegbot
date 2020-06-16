@@ -56,9 +56,9 @@ public class Main extends ListenerAdapter{
 				{
 					event.getChannel().sendMessage("Pong!").queue();
 				}
-				else if (msg.startsWith("/help"))
+				else if (msg.startsWith("/help") && PermissionUtil.checkPermission(event.getMember(), Permission.ADMINISTRATOR))
 				{
-					
+					event.getChannel().sendMessage("Admin Help Panel\n\n**Giveaway Commands**\n/giveaway create <giveaway name> <pastebin raw url for igns> - Create a giveaway of that name and enters the igns of all participants into the giveaway via the url.\n/giveaway roll <giveaway name> - Rolls for a winner from the eligible list. The person rolled will no longer be eligible for this giveaway. (Can roll multiple times)\n/giveaway close <giveaway name> - Closes the giveaway forever (USE IT AT YOUR OWN RISK).").queue();
 				}
 				else if (msg.startsWith("/createevent"))
 				{
