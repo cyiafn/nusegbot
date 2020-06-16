@@ -159,7 +159,7 @@ public class Main extends ListenerAdapter{
 							}
 							else if(ignList.size() == 1) {
 								String winner = ignList.get(0);
-								event.getChannel().sendMessage(":tada:The winner is " + winner+ "!:data:").queue();
+								event.getChannel().sendMessage(":tada:The winner is " + winner+ "!:tata:").queue();
 								try {
 									db.connect();
 									db.update("DELETE FROM participants WHERE ign = '"+winner+"' AND giveawayName = '"+msg+"'");

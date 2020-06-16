@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.safety.Whitelist;
 
 import nusegbot.DBConnection;
 
@@ -26,9 +27,18 @@ public class Giveaway {
 		try {
 			Document doc = Jsoup.connect(link).get();
 			System.out.println(doc.toString());
-			Element ele = doc.select("body").first();
-			String names = ele.text();
-			nameList = names.split(" ");
+			doc.outputSettings(new Document.OutputSettings().prettyPrint(false));
+			doc.select("br").append("\\n");
+			doc.select("p").prepend("\\n\\n");
+			String str = doc.html().replaceAll("\\\\n", "\n");
+			String strWithNewLines = 
+		            Jsoup.clean(str, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
+			//Element ele = doc.select("body").first();
+			//String names = ele.text();
+			nameList = strWithNewLines.split("\n");
+			for (int i = 0; i < nameList.length; i++) {
+				nameList[i] = nameList[i].strip();
+			}
 		}
 		catch (Exception e)
 		{
