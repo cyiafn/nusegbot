@@ -10,8 +10,14 @@ import java.util.Vector;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.GenericMessageReactionEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.internal.utils.PermissionUtil;
 import nusegbot.functions.CreateEvent;
@@ -239,6 +245,79 @@ public class Main extends ListenerAdapter{
 		}
 		
 	}
+	@Override
+	public void onMessageReactionAdd(MessageReactionAddEvent event) {
+		Guild guild = event.getGuild();
+		if (event.getChannel().getName().equals("role-assign"))
+		{ 
+			if (event.getReactionEmote().getId().equals("727188821128773744") ) {
+				Role role = event.getGuild().getRolesByName("Dota 2", false).get(0);
+				guild.addRoleToMember(event.getMember(), role).queue();
+			}
+			else if (event.getReactionEmote().getId().equals("727190275817996350"))
+			{
+				Role role = event.getGuild().getRolesByName("Hearthstone", false).get(0);
+				guild.addRoleToMember(event.getMember(), role).queue();
+			}
+			else if (event.getReactionEmote().getId().equals("727190373772034099"))
+			{
+				Role role = event.getGuild().getRolesByName("LoL", false).get(0);
+				guild.addRoleToMember(event.getMember(), role).queue();
+			}
+			else if (event.getReactionEmote().getId().equals("727190520086003753"))
+			{
+				Role role = event.getGuild().getRolesByName("MLBB", false).get(0);
+				guild.addRoleToMember(event.getMember(), role).queue();
+			}
+			else if (event.getReactionEmote().getId().equals("727190400271646791"))
+			{
+				Role role = event.getGuild().getRolesByName("OW", false).get(0);
+				guild.addRoleToMember(event.getMember(), role).queue();
+			}
+			else if (event.getReactionEmote().getName().equals("727190232440766466"))
+			{
+				Role role = event.getGuild().getRolesByName("Smash", false).get(0);
+				guild.addRoleToMember(event.getMember(), role).queue();
+			}
+		}
+	}
+	@Override
+	public void onMessageReactionRemove(MessageReactionRemoveEvent event) {
+		Guild guild = event.getGuild();
+		if (event.getChannel().getName().equals("role-assign"))
+		{ 
+			if (event.getReactionEmote().getId().equals("727188821128773744") ) {
+				Role role = event.getGuild().getRolesByName("Dota 2", false).get(0);
+				guild.removeRoleFromMember(event.getMember(), role).queue();
+			}
+			else if (event.getReactionEmote().getId().equals("727190275817996350"))
+			{
+				Role role = event.getGuild().getRolesByName("Hearthstone", false).get(0);
+				guild.removeRoleFromMember(event.getMember(), role).queue();
+			}
+			else if (event.getReactionEmote().getId().equals("727190373772034099"))
+			{
+				Role role = event.getGuild().getRolesByName("LoL", false).get(0);
+				guild.removeRoleFromMember(event.getMember(), role).queue();
+			}
+			else if (event.getReactionEmote().getId().equals("727190520086003753"))
+			{
+				Role role = event.getGuild().getRolesByName("MLBB", false).get(0);
+				guild.removeRoleFromMember(event.getMember(), role).queue();
+			}
+			else if (event.getReactionEmote().getId().equals("727190400271646791"))
+			{
+				Role role = event.getGuild().getRolesByName("OW", false).get(0);
+				guild.removeRoleFromMember(event.getMember(), role).queue();
+			}
+			else if (event.getReactionEmote().getName().equals("727190232440766466"))
+			{
+				Role role = event.getGuild().getRolesByName("Smash", false).get(0);
+				guild.removeRoleFromMember(event.getMember(), role).queue();
+			}
+		}
+	}
+	
 	//onguildvoicejoin
 	@Override
 	public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
@@ -253,4 +332,6 @@ public class Main extends ListenerAdapter{
 			
 		}
 	}
+	
+	
 }
