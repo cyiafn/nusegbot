@@ -23,17 +23,7 @@ NO IMG:
 		String[] parsedStr = parsed.split("\\|");
 		
 		Boolean img = false;
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-	
-=======
-		
-		System.out.println("arr size is " + parsedStr.length);
->>>>>>> Stashed changes
-=======
-		
-		System.out.println("arr size is " + parsedStr.length);
->>>>>>> Stashed changes
+
 		
 		if (parsedStr.length == 6) {
 			img = true;
