@@ -24,7 +24,12 @@ NO IMG:
 		
 		Boolean img = false;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 	
+=======
+		
+		System.out.println("arr size is " + parsedStr.length);
+>>>>>>> Stashed changes
 =======
 		
 		System.out.println("arr size is " + parsedStr.length);
